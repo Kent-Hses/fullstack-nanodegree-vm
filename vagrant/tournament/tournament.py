@@ -15,14 +15,16 @@ def deleteMatches():
     """Remove all the match records from the database."""
     db = connect()
     c = db.cursor()
-    c.execute("DROP TABLE matchHistory CASCADE")
+    c.execute("DELETE FROM matchhistory")
+    db.commit()
     db.close()
 
 def deletePlayers():
     """Remove all the player records from the database."""
     db = connect()
     c = db.cursor()
-    c.execute("DROP TABLE playerlist CASCADE")
+    c.execute("DELETE from playerlist")
+    db.commit()
     db.close()
 
 def countPlayers():
@@ -34,7 +36,7 @@ def countPlayers():
     result = c.fetchone()
     # fetchall() retreives the data.
     resultint = int(result[0])
-    print c
+    # print resultint
     return resultint
     db.close()
   
@@ -70,11 +72,7 @@ def playerStandings():
     c = db.cursor()
     c.execute("SELECT * FROM standings ORDER BY score DESC")
     result = c.fetchall()
-    for row in result:
-       for tuple in row:
-          print tuple
-       print "-----" 
-
+    return result
     db.close()
 
 def reportMatch(winner, loser):

@@ -15,14 +15,14 @@ def deleteMatches():
     """Remove all the match records from the database."""
     db = connect()
     c = db.cursor()
-    c.execute("DROP TABLE matchHistory")
+    c.execute("DROP TABLE matchHistory CASCADE")
     db.close()
 
 def deletePlayers():
     """Remove all the player records from the database."""
     db = connect()
     c = db.cursor()
-    c.execute("DROP TABLE playerlist")
+    c.execute("DROP TABLE playerlist CASCADE")
     db.close()
 
 def countPlayers():
@@ -31,11 +31,12 @@ def countPlayers():
     c = db.cursor()
     c.execute("SELECT count(*) as numOfPlayers FROM playerlist") 
     
-    result = c.fetchall()
+    result = c.fetchone()
     # fetchall() retreives the data.
-
+    resultint = int(result[0])
+    print c
+    return resultint
     db.close()
-    return result
   
 def registerPlayer(name):
     """Adds a player to the tournament database.
@@ -48,7 +49,7 @@ def registerPlayer(name):
     """
     db = connect()
     c = db.cursor()
-    c.execute("INSERT INTO playerlist (name) VALUES (%s)", (name))
+    c.execute("INSERT INTO playerlist (name) VALUES (%s)", (str(name),))
     db.commit()
     db.close()
 

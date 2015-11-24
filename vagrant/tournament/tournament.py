@@ -13,16 +13,30 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
-
+    db = connect()
+    c = db.cursor()
+    c.execute("DROP TABLE matchHistory")
+    db.close()
 
 def deletePlayers():
     """Remove all the player records from the database."""
-
+    db = connect()
+    c = db.cursor()
+    c.execute("DROP TABLE playerlist")
+    db.close()
 
 def countPlayers():
     """Returns the number of players currently registered."""
+    db = connect()
+    c = db.cursor()
+    c.execute("SELECT count(*) as numOfPlayers FROM playerlist") 
+    
+    result = c.fetchall()
+    # fetchall() retreives the data.
 
-
+    db.close()
+    return result
+  
 def registerPlayer(name):
     """Adds a player to the tournament database.
   
@@ -32,7 +46,11 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
-
+    db = connect()
+    c = db.cursor()
+    c.execute("INSERT INTO playerlist (name) VALUES (%s)", (name))
+    db.commit()
+    db.close()
 
 def playerStandings():
     """Returns a list of the players and their win records, sorted by wins.
@@ -47,7 +65,16 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    db = connect()
+    c = db.cursor()
+    c.execute("SELECT * FROM standings ORDER BY score DESC")
+    result = c.fetchall()
+    for row in result:
+       for tuple in row:
+          print tuple
+       print "-----" 
 
+    db.close()
 
 def reportMatch(winner, loser):
     """Records the outcome of a single match between two players.
@@ -56,8 +83,17 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
- 
- 
+    
+    db = connect()
+    c = db.connect()
+    # inserts in to the matchHistory
+    #First Inserts to indicate a win by placing a 1 
+    c.execute("INSERT into matchHistory (winner, loser, win, lost) VALUES (%s)", (winner, loser, 1, 0)) 
+    #Second Inserts to indicate a lost
+    c.execute("INSERT into matchHistory (winner, loser, win, lost) VALUES (%s)", (loser, winner, 0, 1))
+    c.commit()
+    db.close()
+
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
   
@@ -73,5 +109,14 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
-
-
+        
+    db = connect()
+    c = db.cursor()
+    c.execute("SELECT  * FROM standings ORDER BY score DESC")
+    MATCHES = []
+    result = c.fetchall()
+    for index in (len(result)/2):
+       MATCHES.append = (result[index][0], result[index][1], result[index+1][0], result[index+1][1])
+    
+    return MATCHES
+    db.close()

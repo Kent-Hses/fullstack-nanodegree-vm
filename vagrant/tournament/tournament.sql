@@ -14,20 +14,44 @@ CREATE TABLE playerlist ( p_id SERIAL primary key,
 --Table that contains the data of the matches
 CREATE TABLE matchHistory ( match_id SERIAL primary key,
                             winner int  REFERENCES playerlist(p_id),
-                            loser int REFERENCES playerlist(p_id),
-                            win int,
-                            lose int
+                            loser int REFERENCES playerlist(p_id)
                           );
 
-CREATE scoreSTANDING as SELECT playerlist.name,
-                          count(matchhistory.winner) as wins
-                   FROM playerlist 
-                   LEFT JOIN matchhistory 
-                       ON playerlist.p_id = matchhistory.winner 
-                   GROUP BY playerlist.name
-                   ORDER BY wins;
+--View used to relate player with their score
+
+CREATE VIEW winVIEW as SELECT playerlist.p_id,
+                              playerlist.name,
+                              count(matchhistory.winner) as wins
+                            FROM playerlist 
+                            LEFT JOIN matchhistory 
+                              ON playerlist.p_id = matchhistory.winner 
+                            GROUP BY playerlist.p_id,
+                                     playerlist.name
+                            ORDER BY wins;
+
+CREATE VIEW lostVIEW as SELECT playerlist.p_id,
+                               playerlist.name,
+                               count(matchhistory.loser) as losts
+                              FROM playerlist
+                              LEFT JOIN matchhistory
+                               ON playerlist.p_id = matchhistory.loser
+                              GROUP BY playerlist.p_id,
+                                       playerlist.name
+                              ORDER BY losts;
+
+--
+CREATE VIEW standings as SELECT winVIEW.p_id,
+                                winVIEW.name,
+                                wins,
+                                SUM(winVIEW.wins + lostVIEW.losts) as numOfmatch
+                         FROM winVIEW
+                         LEFT JOIN lostVIEW
+                           on winVIEW.p_id = lostVIEW.p_id
+                         GROUP BY winVIEW.p_id, winVIEW.name, winVIEW.wins
+                         ORDER BY wins;
 
 /*
+--first attempt
 CREATE VIEW numOfmatch as SELECT p_id,
                                  count(*) 
                           FROM matchhistory

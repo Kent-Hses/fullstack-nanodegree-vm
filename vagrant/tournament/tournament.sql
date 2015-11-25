@@ -28,7 +28,7 @@ CREATE VIEW winVIEW as SELECT playerlist.p_id,
                             GROUP BY playerlist.p_id,
                                      playerlist.name
                             ORDER BY wins;
-
+--Primarily Used to help count the total matches
 CREATE VIEW lostVIEW as SELECT playerlist.p_id,
                                playerlist.name,
                                count(matchhistory.loser) as losts
@@ -39,7 +39,7 @@ CREATE VIEW lostVIEW as SELECT playerlist.p_id,
                                        playerlist.name
                               ORDER BY losts;
 
---
+--Combination of winVIEW and lostVIEW for the playerstanding method
 CREATE VIEW standings as SELECT winVIEW.p_id,
                                 winVIEW.name,
                                 wins,
@@ -50,8 +50,17 @@ CREATE VIEW standings as SELECT winVIEW.p_id,
                          GROUP BY winVIEW.p_id, winVIEW.name, winVIEW.wins
                          ORDER BY wins;
 
+--VIEW used to pair people for the next round using swiss pairing method
+CREATE VIEW pairing as SELECT white.p_id as whiteID,
+                              white.name as whiteNAME,
+                              black.p_id as blackID, 
+                              black.name as blackNAME
+                       FROM standings as white, standings as black
+                       WHERE white.wins = black.wins
+                          and white.p_id < black.p_id;
+
 /*
---first attempt
+--OLD
 CREATE VIEW numOfmatch as SELECT p_id,
                                  count(*) 
                           FROM matchhistory

@@ -15,6 +15,7 @@ def deleteMatches():
     """Remove all the match records from the database."""
     db = connect()
     c = db.cursor()
+    #deletes data from matchhistory
     c.execute("DELETE FROM matchhistory")
     db.commit()
     db.close()
@@ -23,6 +24,7 @@ def deletePlayers():
     """Remove all the player records from the database."""
     db = connect()
     c = db.cursor()
+    #Deletes data from playerlist
     c.execute("DELETE from playerlist")
     db.commit()
     db.close()
@@ -31,8 +33,8 @@ def countPlayers():
     """Returns the number of players currently registered."""
     db = connect()
     c = db.cursor()
+    # counts from playerlist
     c.execute("SELECT count(*) as numOfPlayers FROM playerlist") 
-    
     result = c.fetchone()
     # fetchall() retreives the data.
     resultint = int(result[0])
@@ -70,7 +72,9 @@ def playerStandings():
     """
     db = connect()
     c = db.cursor()
-    c.execute("SELECT * FROM standings ORDER BY score DESC")
+    # selects from standings a joined view of winVIEW and lostVIEW 
+    # the VIEWs Joined from ( playerlist & matchHistory ) 
+    c.execute("SELECT * FROM standings ORDER BY wins DESC")
     result = c.fetchall()
     return result
     db.close()
@@ -84,13 +88,10 @@ def reportMatch(winner, loser):
     """
     
     db = connect()
-    c = db.connect()
-    # inserts in to the matchHistory
-    #First Inserts to indicate a win by placing a 1 
-    c.execute("INSERT into matchHistory (winner, loser, win, lost) VALUES (%s)", (winner, loser, 1, 0)) 
-    #Second Inserts to indicate a lost
-    c.execute("INSERT into matchHistory (winner, loser, win, lost) VALUES (%s)", (loser, winner, 0, 1))
-    c.commit()
+    c = db.cursor()
+    # inserts in to the matchHistory a winner's id and a loser's id
+    c.execute("INSERT into matchhistory (winner, loser) VALUES (%s, %s)", (str(winner), str(loser), )) 
+    db.commit()
     db.close()
 
 def swissPairings():
@@ -111,11 +112,16 @@ def swissPairings():
         
     db = connect()
     c = db.cursor()
-    c.execute("SELECT  * FROM standings ORDER BY score DESC")
-    MATCHES = []
-    result = c.fetchall()
-    for index in (len(result)/2):
-       MATCHES.append = (result[index][0], result[index][1], result[index+1][0], result[index+1][1])
-    
-    return MATCHES
+    #pairing done in SQL by self join
+    c.execute("SELECT * FROM pairing")   
+    matches = c.fetchall()
+ 
+    #Old
+    """matches = []
+    standing = playerStandings()
+    for index in range(0, len(standing)):
+       matches.append = (standing[(index*2)][0], standing[(index*2)][1], [standing(index*2)+1][0], standing[(index*2)+1][1])
+    """   
+
+    return matches
     db.close()

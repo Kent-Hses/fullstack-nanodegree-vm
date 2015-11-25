@@ -116,12 +116,5 @@ def swissPairings():
     c.execute("SELECT * FROM pairing")   
     matches = c.fetchall()
  
-    #Old
-    """matches = []
-    standing = playerStandings()
-    for index in range(0, len(standing)):
-       matches.append = (standing[(index*2)][0], standing[(index*2)][1], [standing(index*2)+1][0], standing[(index*2)+1][1])
-    """   
-
     return matches
     db.close()

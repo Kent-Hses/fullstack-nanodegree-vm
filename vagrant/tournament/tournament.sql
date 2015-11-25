@@ -59,24 +59,3 @@ CREATE VIEW pairing as SELECT white.p_id as whiteID,
                        WHERE white.wins = black.wins
                           and white.p_id < black.p_id;
 
-/*
---OLD
-CREATE VIEW numOfmatch as SELECT p_id,
-                                 count(*) 
-                          FROM matchhistory
-                          GROUP BY p_id;
-
-CREATE VIEW standings as SELECT pidtable.p_id,
-                                playerlist.name,
-                                pidtable.score,
-                                pidtable.numMatch
-                         FROM ( SELECT p_id,
-                                       sum(win) as score,
-                                       count(*) as numMatch
-                                FROM matchHistory 
-                                GROUP BY p_id
-                              ) as pidtable,
-                              playerlist
-                         WHERE pidtable.p_id = playerlist.p_id;
-   
-*/
